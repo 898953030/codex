@@ -1022,7 +1022,7 @@ pub(crate) fn build_specs(
             // Do nothing.
         }
         ConfigShellToolType::ShellCommand => {
-            builder.push_spec(create_shell_command_tool());
+            builder.push_spec_with_parallel_support(create_shell_command_tool(), true);
         }
     }
 
@@ -1512,6 +1512,20 @@ mod tests {
         assert!(find_tool(&tools, "grep_files").supports_parallel_tool_calls);
         assert!(find_tool(&tools, "list_dir").supports_parallel_tool_calls);
         assert!(find_tool(&tools, "read_file").supports_parallel_tool_calls);
+    }
+
+    #[test]
+    fn shell_command_supports_parallel_tool_calls() {
+        let tools_config = ToolsConfig {
+            shell_type: ConfigShellToolType::ShellCommand,
+            apply_patch_tool_type: None,
+            web_search_request: false,
+            include_view_image_tool: false,
+            experimental_supported_tools: Vec::new(),
+        };
+        let (tools, _) = build_specs(&tools_config, None).build();
+
+        assert!(find_tool(&tools, "shell_command").supports_parallel_tool_calls);
     }
 
     #[test]
